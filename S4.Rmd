@@ -1,6 +1,13 @@
 ---
-output: md_document
+output: rmarkdown::github_document
 ---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
 
 # R 3.0.0以降のS4クラスの定義方法
 
