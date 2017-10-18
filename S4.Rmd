@@ -1,0 +1,119 @@
+---
+output: md_document
+---
+
+# R 3.0.0以降のS4クラスの定義方法
+
+R 3.0.0から`setClass()`には`slots`という引数が追加され、`representation`引数ではなくこちらを使うことが推奨されています。
+
+> `setClass()` has a new argument, `slots`, clearer and less ambiguous than `representation`. It is recommended for future code, but should be back-compatible. At the same time, the allowed slot specification is slightly more general. See the documentation for details.  
+(https://cran.r-project.org/bin/windows/base/old/3.0.0/NEWS.R-3.0.0.html)
+
+また、`prototype`引数や`validity`引数についても別の手段が推奨されています。
+
+> These arguments are currently allowed, but either they are unlikely to be useful or there are modern alternatives that are preferred.  
+(`?setClass`, https://stat.ethz.ch/R-manual/R-devel/library/methods/html/setClass.html)
+
+
+## `representation`
+
+`representation`引数はS4クラスのスロットを指定するものでした。これは`slots`引数で完全に代替でき、`representation()`の代わりに名前付きベクトルを指定します。
+
+具体的には、古い書き方だと以下ようなクラス定義だったものは、
+
+```{r class-define-slots-old}
+setClass("ClassA_deprecated",
+         representation = representation(slotA = "character",
+                                         slotB = "numeric"))
+```
+
+以下のように書くことが推奨されます。
+
+```{r class-define-slots-new}
+setClass("ClassA",
+         slots = c(slotA = "character",
+                   slotB = "numeric"))
+```
+
+`showClass()`を使うと、いずれも同じ定義になっていることが確認できます。
+
+```{r show-class}
+showClass("ClassA_deprecated")
+showClass("ClassA")
+```
+
+## `prototype`
+
+`prototype`引数は、各スロットのデフォルト値を指定するためのものでした。現在は、デフォルト値を指定したい場合は、初期化時に呼び出されるメソッド`initialize()`を実装してその中に初期化処理を入れる、というやり方が推奨されています。
+
+具体的には、古い書き方だと以下のようなクラス定義だったものは、
+
+```{r class-define-initialize-old}
+setClass("ClassB_deprecated",
+         representation = representation(slotA = "character",
+                                         slotB = "numeric"),
+         prototype = prototype(slotA = "DEFAULT",
+                               slotB = pi))
+```
+
+以下のようにメソッドを定義します。`callNextMethod()`でデフォルトの`initialize()`メソッドを呼んでおかないと、次に説明するバリデーション等の処理が行われないので注意しましょう。
+
+```{r class-define-initialize-new}
+setClass("ClassB",
+         slots = c(slotA = "character",
+                   slotB = "numeric"))
+
+setMethod("initialize", signature = "ClassB",
+          function(.Object, slotA = "DEFAULT", slotB = pi) {
+            .Object <- callNextMethod()
+            .Object@slotA <- slotA
+            .Object@slotB <- slotB
+            .Object
+          })
+```
+
+やや冗長にはなりますが、単純なデフォルト引数の処理だけでなく、様々な初期化処理を自由に指定できるのが利点でしょう。
+
+`new()`で新しいインスタンスを作ってみると、以下のように同じ値になっていることがわかります。
+
+```{r new-class}
+new("ClassB_deprecated")
+new("ClassB")
+```
+
+## `validity`
+
+`validity`引数は、S4クラスのインスタンス作成時に行うバリデーションを指定するためのものでした。`setValidity()`を代わりにに使うことが推奨されています。
+
+具体的には、以下のようにクラス定義をしていたものは
+
+```{r class-define-validity-old}
+is_valid_classC <- function(object) {
+  if (object@slotB >= 0) {
+    TRUE 
+  } else {
+    "slotB is negative"
+  }
+}
+
+setClass("ClassC_deprecated",
+         representation = representation(slotA = "character",
+                                         slotB = "numeric"),
+         validity = is_valid_classC)
+```
+
+クラス定義のあとで`setValidity()`を指定します。
+
+```{r class-define-validity-new}
+setClass("ClassC",
+         slots = c(slotA = "character",
+                   slotB = "numeric"))
+setValidity("ClassC", is_valid_classC)
+```
+
+いずれも、以下のようにエラーになることが確認できるでしょう。
+
+```{r, validity-errors, error=TRUE}
+new("ClassC_deprecated", slotB = -1)
+new("ClassC", slotB = -1)
+```
