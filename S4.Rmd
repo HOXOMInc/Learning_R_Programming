@@ -46,6 +46,8 @@ setClass("ClassA",
 
 ```{r show-class}
 showClass("ClassA_deprecated")
+
+
 showClass("ClassA")
 ```
 
@@ -85,6 +87,8 @@ setMethod("initialize", signature = "ClassB",
 
 ```{r new-class}
 new("ClassB_deprecated")
+
+
 new("ClassB")
 ```
 
@@ -122,5 +126,7 @@ setValidity("ClassC", is_valid_classC)
 
 ```{r, validity-errors, error=TRUE}
 new("ClassC_deprecated", slotB = -1)
+
+
 new("ClassC", slotB = -1)
 ```
