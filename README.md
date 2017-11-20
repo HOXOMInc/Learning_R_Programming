@@ -2,9 +2,13 @@
 
 著:Kun Ren・訳:湯谷啓明、松村杏子、市川太祐・監訳:株式会社ホクソエム
 
-## 正誤表・その他
+## 正誤表
 * [正誤表](errata/table-of-errata.md)
-* （大変お恥ずかしい話ですが）本書に関して間違いを見つけた方は、[Issue](https://github.com/HOXOMInc/Learning_R_Programming/issues)から間違いの内容を報告いただくか、[正誤表](errata/table-of-errata.md)にプルリクエストを出していただくか、監訳者の1人高柳(Twitter: [_stakaya](https://twitter.com/_stakaya)まで連絡いただけると大変ありがたいです
+
+（大変お恥ずかしい話ですが）本書に関して間違いを見つけた方は、[Issue](https://github.com/HOXOMInc/Learning_R_Programming/issues)から間違いの内容を報告いただくか、[正誤表](errata/table-of-errata.md)にプルリクエストを出していただくか、監訳者の1人高柳(Twitter: [_stakaya](https://twitter.com/_stakaya)まで連絡いただけると大変ありがたいです。
+
+## その他
+
 * [R 3.0.0以降のS4クラスの定義方法](errata/S4.md) (「10.3 S4を扱う」についての補足)
 
 ## リンク集
